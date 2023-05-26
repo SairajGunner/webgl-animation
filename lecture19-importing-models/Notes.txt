@@ -1,0 +1,101 @@
+IMPORTING 3D MODELS -
+
+* When we need complex looking objects in our scene like an alien, a tree, etc, we need to create it in 3D designing tools like Blender, C4D, etc and then import it into three js because creating something so complex using primitive meshes in three js could be a very difficult task and can take a lot of time
+
+* There are various formats of 3D models that are used because of various variations in the following parameters -
+    1. Type of Data
+    2. Weight
+    3. Compression
+    4. Compatibility
+    5. Copyrights, etc.
+
+* Following are the criteria that are considered before selecting a type of 3D model -
+    1. Dedicated to one software
+    2. Very light but might lack specific Data
+    3. Almost all data but very heavy
+    4. open source
+    5. not open source
+    6. Binary - hard to edit
+    7. ASCII - Easy to edit even using text editor
+
+* Popular 3D Model Formats - 
+    obj, fbx, stl, ply, collada, d3s, gltf, etc.
+    We can even create our own formats
+
+* In recent times, one of these formats has become very famous and that is the gltf format - gltf has been created by the Khronos group and is being backed by brands like Apple, AMD, ATI, Nvidia, etc.
+
+* gltf stands for GL Transmission Format
+
+* gltf supports different types of data like geometries, materials, cameras, scene graphs (object in object), animations, skeletons, morphing, lights, etc.
+
+* Various export formats json, binary, embed textures
+
+* Becoming the standard for real time rendering and almost all 3D softwares and game engines and libraries support it
+
+* gltf is not needed in all cases - at times we can do with other light weight formats as well
+    Before choosing gltf, we need to question the data we need, the weight of the file and how much time it takes to decompress it, etc.
+
+* We can download sample gltf models from this github repository - 
+    https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0
+
+* A gltf file can have different formats. Four of the main formats are -
+    glTF, glTF-Binary, glTF-Draco, glTF-Embedded
+
+* Default GLTF -
+    * It is the default format
+    * It has multiple files
+    * Duck.gltf is a JSON that contains cameras, lights, scenes, materials, object transformations, but not geometries or textures
+    * Duck0.bin is a binary that usually contains data like the geometries (vertices positions, UV coordinates, normals, colors, etc.)
+    * DuckCM.png is the texture
+    * The Duck.gltf has references to the Duck0.bin and the DuckCM.png and hence the other files are loaded automatically when we load the .gltf file
+
+* glTF-Binary - 
+    * Only one file with extension .glb
+    * Contains all the data - geometries, textures and cameras, lights, etc.
+    * It is completely binary
+    * Usually lighter as it is binary
+    * Easier to load as it is only one file
+    * Hard to alter data as it is difficult to play with binary data
+
+* glTF-Draco -
+    * It contains multiple files like in case of the default glTF
+    * But it is very light as compared to the other extensions, in our case the default model size is 123KB and the draco model is 36KB
+
+* glTF-Embedded -
+    * This contains just one json file that has all the information
+    * Advantage is that we can modify the contents coz json is readable
+    * Heavier
+
+* WHEN TO USE WHICH TYPE -
+    * It totally depends on how we want to handle the assets
+    * If we want to be able to alter files, glTF-default is the best option
+    * Loading multiple files can be faster
+    * If having one file seems better to use, glTF-Binary is the better option
+
+* LOADING THE OBJECT INTO OUR SCENE -
+    * We need a GLTFLoader to load the gltf model to our scene
+    * Once we have loaded the model to our script, on going through the object structure, we find that the mesh is situated at this location -
+        MainObject -> scene -> children -> Object3D -> children -> mesh | camera
+    * In the above structure, the Object3D has a scale property that is very small and hence if we are loading it, we need to make sure that the scale is correct according to our scene scale. Also, we need to take a look at the position and the rotation properties of the Object3D
+    * There are multiple ways to get the mesh into our scene from this structure -
+        1. Add the whole scene in the gltf to our scene - While this works, it can be a waste of resources
+        2. Add the children from the Object3D and ignore the camera coz it is redundant
+        3. Filtering the children before adding to our scene
+        4. Add only the mesh and end up with a model that is with wrong scale, position and rotation
+        5. Open the file in the 3D software, change the properties and export again - Bruno uses this method usually
+    
+    * Loading the duck is very easy as it is composed of just one child element within the Object3D, but in many cases, we have multiple children in the Object3D for which we need to loop through a clone of the array we have in the model
+    * Draco models need some different method to load them which is not the case for the other three types described above - Draco is sort of a compression technique with which the size of the model reduces drastically - Even though the size is less, there are some flaws due to which it is not always preferred. Some information about the draco is -
+        * Much lighter than the default version
+        * Compression is applied to the buffer data (typically the geometry)
+        * Draco is not exclusive to glTF but they both got popular at the same time
+        * Google develops this algorithm under the open-source apache license
+        * Draco has a web assembler logic available within three js which can speed up the loading for us
+        * DracoLoader is not always preferred because even though we save on the size of the model, we need to add considerable code to make the loading possible. Hence, if we have multiple models that need to be loaded, we can use the DracoLoader which can make it quick, but for smaller models, it is not a good choice
+
+* ANIMATIONS IN LOADED MODELS -
+    * In the fox example, we have some animations that are part of the model which can be used by us to have an animated model in our three js scene
+    * Each animation in the animations property is an instance of the three js AnimationClip Class
+    * We need to create an AnimationMixer which would act as a player for an object that contains one or multiple AnimationClip instances
+    * When we load the AnimationClip to the AnimationMixer instance, we get an AnimationAction object which has the play method
+    * After calling the play method, we need to request update for it on each frame change in the requestAnimationFrame function

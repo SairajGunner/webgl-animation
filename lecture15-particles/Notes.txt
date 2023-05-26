@@ -1,0 +1,36 @@
+PARTICLES -
+
+* Particles can be used to create stars, smoke, rain, dust, fire, etc.
+* We can have thousands of them keeping a reasonable framerate
+* Each particle is composed of a plane (two triangles) facing the camera
+
+* Creating particles is just like creating a mesh
+* Things needed to create a particle -
+    1. A geometry
+    2. An instance PointsMaterial
+    3. An instance of Points
+
+First create a geometry - Each vertex will become a particle
+
+Then create an instance of PointsMaterial - Add two properties - 
+    size - size of the particle
+    sizeAttenuation - this is boolean which defines if we want the object to appear larger if close to the  camera and vice versa
+
+Next create an instance of Points class passing in the geometry and the material create above
+
+
+PointsMaterial -
+Color:
+We can add color to this just like other materials we have seen before
+
+Textures:
+* We can add textures to the points - Texture source for particles - https://www.kenney.nl/assets/particle-pack
+* While adding the texture, we notice that the textures on one particle hides the one behind and this is not realisitc - if we are using cicles, the circle in front should be transperant in the middle so that the circle behind is visible from it - to fix this, we can use alphaMap instead of map and set transperant to true
+* Also, the sides of the circle has a square covering which is black and opaque - This is because the particles are drawn in the same order that they are created in and WebGl does not know which is supposed to in front or which is behind. There are multiple ways to fix this issue -
+    1. Alpha Test - It is a value between 0 and 1 that enables the WebGl to know when not to render the pixel according to that pixel's transperancy. By default, the value of alphaTest is 0 which means it will render pixels with value of 0. We can use 0.01 so that pixels with value 0 will not be rendered at all
+
+    2. Depth Test - This property is true by default. WebGl checks whether the currently rendered particle is in front of or behind the other particles with this property. But if we set it to false, WebGl will stop testing for that. We need to deactivate alphaTest before enabling depthTest. This fixes our problem, but causes other problems. Since WebGl now is not testing the depth of the position of the particles, it can will behave weirdly - consider adding a cube to the scene and observe - we see that the particles behind the cube are visible through the cube - while this looks attractive, it is very unreal
+
+    3. Deactivating the Depth Write - The depth information of the particles in the scene are stored in something known as the depth buffer. So, by deactivating the depthWrite property, we will not write it in the buffer but the render will be according to the depth information it gets while creation. This is the best solution for our problem and is used most of the times when such situations arise
+
+    4. Blending - While this is relevant to the techniques to solve this issue, it can be a separate topic because it gives us a different result. We can set the blending property to THREE.AdditiveBlending to make it add the light colors of particles that are one over the other which looks cool. But, we should note that this HAS AN IMPACT ON PERFORMANCE

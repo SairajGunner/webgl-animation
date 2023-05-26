@@ -1,0 +1,92 @@
+TEXTURES -
+
+Textures deal with showing images or different types of images on the scene
+There are different types of textures available -
+1. Color
+2. Alpha (Grayscale) - White visible | Black invisible
+3. Displacement (Grayscale) - Terrain like pattern formed - Needs subdivisions for details
+4. Normal - Adds details(about light) - doesn't need subdivisions - vertices don't move - lure the light about the face orientation - better performance than adding light texture with a lot of subdivisions
+5. Ambient Occlusion (Grayscale) - Adds fake shadows in crevices - not physically accurate - helps to create contrast and see details
+6. Metalness (Grayscale) - White is metallic - black is non metallic - mostly for reflection
+7. Roughness (Grayscale) - Used with metallic - white is rough - black is smooth - mostly for light dissipation
+
+There are many other textures but these are more commonly used.
+We can also create custom textures
+
+These textures (especially metalness and roughness) follow PBR principles
+
+PBR stands for Physically Based Rendering
+They are created by taking into account real physics phenomena, hence adding a realistic touch
+They are becoming a standard for realistic renders
+Many software engines and libraries are using it
+
+Useful links for PBR -
+https://marmoset.co/posts/basic-theory-of-physically-based-rendering/
+https://marmoset.co/posts/physically-based-rendering-and-you-can-too/
+
+Loading an Image-
+1. We can load images using the native javasript way as follows -
+const image = new Image();
+image.onload = () => {
+    const texture = new THREE.Texture(image);   // Making the texture so that three.js can read it
+}
+image.src = '/textures/door/color.jpg'    // Note - we did not use 'static' in the path
+
+2. We can use the TextureLoader class that is part of the three.js library
+All we need to do is to make a new instance and then use the .load(...) function and pass the path of the image as a parameter
+This methods is much faster
+Only one loader is needed to load multiple textures
+There are three callbacks available on the load(...) function, viz. load, progress and error
+
+LoadingManager - We can use an instance of the loading manager class to have a continuous update on the status of the loading of all the assets, viz images, fonts, models, etc.
+
+To apply the texture, we need to map it to the material that we are using for the mesh
+
+Understanding How The Texture is applied -
+It is basically like we are covering the object with brown paper
+So different object would get covered differently and we can see a different image
+We can use UV unwrapping to see the 3D image of the texture
+We can use the geometry.attributes.uv to get the UV coordinates
+
+TRANSFORMATIONS ON TEXTURES -
+We can use the repeat transformation which is a Vector2D
+Hence, we can repeat the image along the x or y axis using THREE.repeatMapping
+Also, we can repeat the image as a mirror using the THREE.mirrorRepeatMapping
+
+There are other transformations as well like offset, rotation, center, etc.
+
+FILTERING & MIPMAPPING-
+Mipmapping is a technique that consists of creating half versions of a texture again and again until we get a 1 X 1 texture
+All this happens inside the GPU and we do not need to worry about it
+
+There are two ways in which Mipmappings are implemented -
+1. minification filter - when the image pixels are much smaller for the render, this minification occurs, eg. when we zoom out a lot and the image is very small as compared to the original texture
+    * We can set the minFilter property to change the minification algorithm to one of these options -
+    i. THREE.NearestFilter
+    ii. THREE.LinearFilter
+    iii. THREE.NearestMipmapNearestFilter
+    iv. THREE.NearestMipmapLinearFilter
+    v. THREE.LinearMipmapNearestFilter
+    vi. THREE.LinearMipmapLinearFilter (default)
+2. magnification filter - when the image used to create the texture is very small and it is being applied to a mesh and the mesh is zoomed in, we get a very blurred image and here is when a magnification mipmapping occurs
+    * We can set the magFilter property to change the mangnification from among these two options-
+    i. THREE.NearestFilter
+    ii. THREE.LinearFilter (default)
+
+* Using NearestFIlter makes the image sharp and also improves performance of the render. Also, when we are using NearestFilter, we can turn off mipmappings which will reduce the burden on the GPU. This can be done by setting generateMipmaps to false
+
+TEXTURE FORMAT AND OPTIMIZATION-
+When using textures, we need to keep in mind 3 things-
+1. the weight - should be as low as possible (.jpg - lossy & lighter | .png lossless & heavier)
+2. the size - textures are stored on the GPU and GPU has storage limitations. Also mipmapping can increase the number of pixels to be stored. We should try to reduce the size of the images as much as possible
+3. the data - textures support transperancy but .jpg cannot have transperancy
+
+** we have to use images that have resolutions that can be divided by 2 because mipmappings are going to work by dividing it by 2
+
+Normal images are usually png because png is lossless and the normal texture highly depends on the orientation of the pixels that should not be lost
+
+WHERE TO FIND TEXTURES? -
+poligon.com
+3dtextures.me
+arroway-textures.ch
+You can also create your own textures using Photoshop or procedural textures using Substance Designer

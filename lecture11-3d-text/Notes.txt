@@ -1,0 +1,33 @@
+3D TEXT-
+
+We are going to use TextBufferGeometry - A little harder than a cube
+
+Specific format of font called typeface
+
+how to get typeface font?
+you can convert any font into typeface using this tool-
+https://gero3.github.io/facetype.js
+some samples are available in the three dependency in the node modules
+while using the font, we are supposed to keep the license in the same folder - in current project this has been copied and pasted from the node_modules
+
+To import the font in the project, we need to use the FontLoader class
+
+Once imported, in the callback function, we can use the font to create our TextBufferGeometry and define the text in it along with some properties like font, size, height, curveSegments, bevelSegments, bevelEnabled, bevelThickness, bevelSize, bevelOffset
+
+Once the scene is ready, in wireframe mode, we can observe that there are a lot of triangles that are being rendered which can take a shot at our performance
+
+To avoid this, we can decrease the values of curveSegments and bevelSegments
+
+Center the TEXT- (AxesHelper used for assistance)
+There are 2 solutions-
+1. Using the Bounding -
+    The bounding is an information associated with the geometry that tells what space is taken by that geometry
+    It can be a box or a sphere
+    Why does three.js have this bounding? - It is used for something known as frustum culling - basically this is the process by virtue of which three.js identifies which objects need to be rendered so that it will not waste the GPU on things that are behind the camera and out of the current view - We will use the bounding measures to recenter the geometry
+    By default sphere bounding is used and hence we need to specify that we need to calculate it
+    textGeometry.computeBoundingBox() and then access the textGeometry.boundingBox property
+    The result is an instance of Box3 with min and max properties which are both Vector3 instances. The min property is not 0 because of the bevelThickness and the bevelSize
+    We can use the translate(...) method to move the complete geometry by half the size of it along the axes
+
+2. Using center() method -
+    Much easier method :D Just one line required

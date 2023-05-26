@@ -1,0 +1,70 @@
+LIGHTS -
+
+* Important lesson I learnt in this exercise - MESH STANDARD MATERIAL WILL NOT WORK WITHOUT ANY INCIDENT LIGHT. IT WILL ONLY DISPLAY BLACK      OBJECTS BECAUSE THERE IS NO LIGHT INCIDENT ON IT, THEREBY FOLLOWING PBR PERFECTLY
+
+We have used the ambient light and the point light, but there are many more.
+
+We just have to instantiate the correct light class and add it to the scene. We can also instantiate the class and then set the relevant properties available on the object
+
+Types of Lights -
+1. Ambient Light-
+    We instantiate the ambient light class
+    first param - color, second - intensity
+    It is omnidirectional lighting - hence, the object looks very similar in color even if there are crevices
+    It can be really useful - we will see ahead
+    We can use the ambient light to understand light bouncing
+    It can be very difficult for graphic engines to simulate light bouncing and hence we can place a point light at one end and then simulate the bounced light using an ambient light with a small intensity
+
+2. Directional Light-
+    Directional light will give us a sun like effect - as if the sun rays were travelling in parallel
+    We can imagine it as a strong light source that is at a considerable distance from our object
+    The effect we get is that the part of the object towards the light is going to be brighter and the other side is going to be a bit darker
+    Unless we are using shadows, there is no difference as to how far we place our light source from the object
+
+3. Hemisphere Light-
+    This is a light that is similar to ambient light, just that it has a different color from the sky than the color coming from the ground - example the light from above can be red and from below can be blue and in between we can see a mix of both, in our case, purple
+    We can use when grass is green and sky is blue
+    params - color (or skyColor), groundColor, intensity
+    This light is also omnidirectional
+
+4. Point Light-
+    It is almost like a ligter
+    the light starts at an infinitely small point and spreads uniformly in every direction
+    We can move it
+    By default the intensity does not fade with distance, but we can control the distance with distance property and how fast it is going to fade using 'decay' property
+
+5. Rect Area Light-
+    This works like the big rectangle lights we see on the photoshoot sets
+    It is a mix between directional light and diffuse light
+    params-color, intensity, width, height
+    This looks super cool without the other lights. Try increasing the intensity
+    RectAreaLight only works with MeshStandardMaterial and MeshPhysicalMaterial
+    We can change the position of the light and since it is a Vector3, we can use lookAt(...) to point the light to another Vector3
+
+6. Spot Light-
+    It is like a flashlight
+    It is a cone of light starting at a point and oriented in a direction
+    params - color, intensity, distance (fade distance), angle, penumbra (if we have 0 here, the light will be very sharp. it blurs out as the value increases), decay
+    We get a circle on the object
+    To rotate the spotlight, we need to add its target property to the scene and move it. target is like an imaginary object that the spotlight aims at and hence we need to add it to the scene ourselves
+
+PERFORMANCES-
+Lights can cause a lot of performance
+If we have to make a city with many lights, we should not add 100 streetlights as it will take a toll on our performance. Should be limited to less than 50
+The idea should be to use it as less as possible
+Performances vary in accordance with the various types of light
+Minimal Cost - Ambient Light & Hemisphere Light
+Moderate Cost - Directional & Point
+High Cost - Spotlight and Rect Area Light
+
+BAKING-
+When we need to have a lot of perfect lights with lots of physics, we need another solution like BAKING
+The idea is to bake the light into the texture
+This can be done in a 3d software but not necessarily
+The drawback is that we cannot move the light anymore and we have to load huge textures as in even if the light moves, the texture on the object will not get updated
+
+HELPERS-
+To asist us with the position of the light, we can use helpers
+eg. HemisphereLightHelper, DirectionalLightHelper, PointLightHelper, RectAreaLightHelper, SpotLightHelper
+* SpotLightHelper has no size and we need to update the position of the helper to its target on the next frame by calling it update method on the requestAnimationFrame function
+* RectAreaLightHelper needs to be imported separeately from node_modules as it is not a part of the THREE object we import. Also, we need to update the position and rotation of the helper manually on the next frame :D

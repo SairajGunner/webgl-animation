@@ -1,0 +1,15 @@
+Animations -
+
+1. Request Animation Frame-
+    window.requestAnimationFrame(function)
+    The sole purpose of this method is to call the function that is being passed on the next frame that is going to be rendered
+    This is going to be the base of our animation as we can apply transformations inside this method and render it everytime the method is called
+    The feel of the animation would depend upon the renderer's frame/sec (in Simon's case it is 60 fps)
+
+2. How to make the animation framerate independent?
+    i. delta time approach - calculate the time difference between the frames and then multiply it the transformation we are applying
+    ii. using the Clock class and its ElapsedTime property - the elapsed time will always start from 0 sec when the animation is loaded and will increase with time. Hence assigning this to the transformation parameter would transform the object accordingly (Do not use the getDelta() method in the Clock class. It might give us unexpected results)
+
+3. Use another library -
+    To have better control over the animations, for example, have better control on tweens and create timelines, we can use a library named GSAP (Green Sock Library)
+    we can use gsap.to(objectPosition: Vector3, options) to create a tween (a movement)

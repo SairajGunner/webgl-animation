@@ -1,0 +1,39 @@
+Geometries
+
+* Every geometry is composed of vertices that are 3D point coordinates
+* These are connected together to form triangles that are called faces
+* We use geometries to create meshes but they can also be used to create particles. Particles are created at each vertex
+* Every vertex can be used to store more data than just its coordinates, eg. UV coordinates, normals, color, etc
+
+Built-in Geometries -
+* All the built-in geometries inherit from the class Geometry
+* This class has many built-in methods like translate(...). rotateX(...), normalize(), etc that can be used not only on the meshes, but also on the vertices mentioned above
+* There are many built-in geometries that can be found in the documentation with examples
+
+BoxGeometry -
+* Until now we have used only three parameters in the box geometry, ie. the height, width and the depth
+* There are 3 more parameters -
+    i. widthSegments: number of subdivisions on the x axis
+    ii. heightSegments: number of subdivisions on the y axis
+    iii. depthSegements: number of subdivisions on the z axis
+
+*Subdivisions determine the number of triangles are developed on the face
+1 subdivision = 2 triangles | 2 subdivisions = 8 triangles (a line splits each face along the x and the y axis hence leading to 4 parts of the square and hence 8 triangles)
+* To see the triangles clearly, we can change wireframes to true in the MeshMaterial we are passing into the geometry
+
+To Create Your Own Geometry -
+1. We need to create an instance of the Geometry class
+2. We need to add the vertices
+3. We need to add a face to the geometry. The params passed into the face are the indices of the vertices being used to create the triangle
+4. Then create a mesh using our custom geometry and then add it to the scene
+
+Buffer Geometries -
+Every built-in geometry has a buffer geometry. Buffer geometries are better in terms of performance and GPU consumption but are a little less developer friendly.
+For built-in geometries, always use buffer geometries instead of normal ones
+
+Creating Your Own Buffer Geometries-
+This is a bit more difficult than creating a buit-in buffer geometry
+We need to create a Float32Array that contains the coordinates of the vertices of the triangle that needs to be created with the number of coordinates we are having (3 in case of 3D)
+Next, we need to create a BufferAttribute and set it to an instance of a BufferGeometry using the setAttribute() function and finally add it as an Object3D object to the scene :)
+
+* For vertices that are shared between triangles, we can provide faces to the BufferGeometry using the indices of the vertices in the Float32Array. This can be very taxing for the developer but it sends less data to process to the GPU, hence increasing its performance

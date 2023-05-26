@@ -1,0 +1,54 @@
+Introduction to Transformation of Objects -
+Transformation is the base of animation. It is about the ability to move and rotate the objects in the scene.
+We have already done a little bit of a transformation by changing the 'z' of the camera so that it is placed away from the object so as to make the object visible
+
+Object3D -
+Every class that inherits the class Object3D (ex: Mesh, PerspectiveCamera, etc) has the following properties:
+1. position
+2. scale
+3. rotation
+4. quaternion
+
+* These properties are compiled into matrices which are read by the renderer
+* Quaternion and rotation affect each other => change in rotation would change the quaternion and vice versa. Both are used to rotate the objects
+
+Position -
+This property lets you move the object / camera / {anything that inherits from Object3D} along the x, y and z axes
+When we say object.position.x = 3 => Object moves to the right by 3 units
+When we say object.position.y = 3 => Object moves up by 3 units
+When we say object.position.z = 3 => Object moves towards the camera / user / you by 3 units
+
+The directions are arbitrary, meaning these would change considering the orientation of the camera / viewer
+The units are arbitrary too. Hence, it is the developer's duty to visualize what he is creating and think for a unit accordingly
+
+We can change the position of the object anytime except after calling the render method of the renderer because the camera has already clicked the picture and now any movement would be immaterial
+
+position also inherits from 'Vector3' that has many more properties / functions than just x, y and z
+
+Vector3 -
+This gives us many useful functions to position objects in space, for example:
+1. length() - This gives us the distance between the centre of the scene and the object for whose position we are calling this method
+2. distanceTo(object: Vector3) - This gives us the distance between the position of the object where the method is called and the position of the object we are passing as parameter. For example, it is useful to calculate the distance between the object and the camera
+3. normalize() - This will change the reference point of the object to a point where the length() would return 1 - YET TO LEARN MORE ABOUT THIS!!
+
+AxesHelper - Helps the developer by showing the axes on the screen. Parameter can be passed to increase the length of the axes displayed. AxesHelper is a class
+
+Scaling -
+We can scale the objects we have placed in the 3D space with the scale property available on Object3D objects which is also a Vector3 property which gives us all the properties and functions we could use for the 'position' property, for example the set(x, y, z) function
+ex: mesh.scale.set(2, 0.5, 0.5)
+
+Rotation - (Euler, Order Matters)
+We can rotate the object around the 3D space with the rotation property which is not a Vector3 property but inherits from Euler instead. Hence the angles here use radians instead of degrees ie. for half a rotation, we would use Math.PI / 2
+One thing to be careful about while using rotation is that rotation happens considering the local axis. This implies that the order of rotation is important
+ex: say we rotate an object in this manner mesh.rotation.set(Math.PI / 2, Math.PI, 0), according to the default order, the object would rotate by 180 degrees along the X-axis and then by Y-axis and then Z. Imagine the object after the rotation along X completes and then rotate along Y. Try imagining the other way around, first Y and then X. As three.js would always consider the standard AxesHelper, the results would be completely different. Simon's example was a game like GTA where the player moves his head where the required order of rotation is always Y first followed by x
+* We can reorder the default setting by using the reorder method. Always use reorder before applying the rotation. We need to pass the order as axes expressed without spaces and in capital letters as a string. ex: mesh.rotation.reorder('YXZ')
+At times, due to rotation along all axes at once, it is possible that one of the axes might get locked, called the gimbal lock
+
+Quaternion -
+We will learn about this in the next lesson
+
+* lookAt(vector3: Vector3) in Object3D -
+Object3D objects have a cool function that helps change the orientation of the object so as to make it directly face to face with an object of type Vector3. ex: the camera which is an Object3D can be asked to look at our mesh at its centre (mesh.position is a Vector3)
+
+Scene Groups (This is beautiful) -
+We can group multiple objects together and apply transformations to the group instead of individual objects. ex: if after modeling, we find out that the size of a house we created is less as compared to the surroundings, we do not need to transform each component of the house separately, but we can rather group them together and apply transformations collectively.

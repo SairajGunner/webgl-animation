@@ -1,0 +1,10 @@
+RAYCASTER -
+
+We can use raycaster in a wide number of scenarios - a few examples being -
+    1. Finding the distance between our player and obstacles
+    2. Identifying collision between objects
+    3. Test if a laser gun hits a target
+    4. Test if an element is under the mouse so that we can simulate mouse events
+    5. Show an alert message if a spaceship is heading towards a planet
+
+

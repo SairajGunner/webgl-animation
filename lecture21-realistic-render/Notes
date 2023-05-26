@@ -1,0 +1,62 @@
+REALISTIC RENDER -
+
+* As seen in the previous lesson, we did load the model successfully but we saw that the colors and details of the model were not quite right and there are a lot of reasons for this to happen
+
+Intensity of Light -
+* The intensity of light in three.js is not physically correct and are based on some arbitrary values which might cause inconsistency when we are importing models from different softwares as the other softwares might use different scales.
+* We need to instruct three.js to be physically correct in terms of light intensity
+* This needs to be done at the renderer by adding this - renderer.physicallyCorrectLights = true
+
+Environment Map -
+* We can control the intensity of the environment map to get a realistic render
+* To do this, in our example, we traversed through all the children in the scene and we picked out items that were Mesh instances and Meshs' who's material is MeshStandardMaterial using scene.traverse(func) and changed the envMap property to our environmentMap. Also, we adjusted the envMapIntensity using dat.GUI by calling this function
+* We can give the environmentMap to all the objects in the scene in an easier way by assigning scene.environment to our environmentMap but would still need the function to traverse through all the objects to apply the envMapIntensity
+
+OutputEncoding -
+* The OutputEncoding decides the output render encoding
+* The default encoding is THREE.LinearEncoding and we should use THREE.sRGBEncoding
+* Another possible value for OutputEncoding can be THREE.GammaEncoding which lets us play with the gamma factor that would act a bit like brightness but we will not use it as it might not be physically correct
+* GammaEncoding stores the data of colors in a way that human eyes perceive better. Human eyes perceive minute differences in dull colors in order to be able to see in the dark and does not differentiate a lot when it comes to brighter colors
+* When we use sRGBEncoding, we are using GammaEncoding with gamma factor of 2.2
+
+Environment Textures -
+* By default the OutputEncoding on the environmentMap is also linear encoding and this can be changed using environmentMap.encoding = sRGBEncoding
+
+* We should not apply sRGBEncoding on NormalMaps, HeightMaps, etc.
+* The models loaded using the GLTFLoader automatically load the textures using the correct encoding
+
+Tone Mapping -
+* Tone mapping is the conversion of HDR to LDR
+* In HDR the peak values of intensity can go beyond 1 and hence this mapping is required
+* Our assets are not HDR but the tone mapping can have a realistic effect as if the camera was poorly adjusted
+* We can change the toneMapping property on the renderer with the following values -
+    1. THREE.NoToneMapping (default)
+    2. THREE.LinearToneMapping
+    3. THREE.ReinhardToneMapping
+    4. THREE.CineonToneMapping
+    5. THREE.ACESFilmicToneMapping
+
+Tone Mapping Exposure - 
+* We can control the amount of light that enters into our tone mapper
+* If we have higher values, the look we get is more brighter as we are mapping very high intensities of light
+
+Anti-Aliasing -
+* The stair-like effect we get on the edge of our geometry is the anti-aliasing
+* This happens because the renderer has to decide if a particular pixel is a part of the geometry or not and for the edges, the renderer would be positive on this question only for the pixels where majority of it is inside the geometry
+* Hence, when we zoom in, we get this stair-like effect
+* Solutions -
+    1. One easy solution would be to increase our render's resolution to double and each pixel color would be the average of the four pixels sharing it. This is called super-sampling (SSAA) or fullscreen sampling (FSAA), it's easy and efficient but not performant
+    2. Another solution to this issue is called multi-sampling which will also render multiple values for the pixels but only for the edge pixels. The values of the pixels are the average of the four divisions sharing it
+    3. three js has an in-built mechanism for anti-aliasing but we need to activate that while we are instantiating the renderer. We cannot assign / modify this property after instantiation
+    4. Devices with pixel ratio > 1 do not actually require anti-aliasing and hence, it would be a better idea if we add this property only for devices that have pixel ratio <=1
+
+LOADING THE HAMBURGER -
+* On loading our burger and setting the scale correctly, we find that we see a weird effect on the texture of the burger which looks like multiple lines on the texture, something unwanted to us
+* These are called shadow acne and can occur on both, curved as well as flat surfaces
+* This happens due to precision issues when calculating if the part of the surface is in shadow or not
+* The hamburger is casting a shadow on itself
+* To fix this, we can shift the shadowMap of the mesh a bit inside so that the surface of the object does not cast a shadow on itself but would still be casting a shadow on other parts of the object
+* This is called the light's bias and we can tweak it using the light shadow's bias and normalBias properties
+    bias - used for flat surfaces
+    normalBias - used for curved surfaces
+* We should increase the normalBias (in our case) until the acne is barely visible

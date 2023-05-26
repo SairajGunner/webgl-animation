@@ -1,0 +1,73 @@
+SHADOWS-
+
+Now that we have completed lights, it is important to learn about shadows as light is always going to create shadows
+There are two types of shadows - Core shadow and drop shadows
+Core Shadow - we already have this. this is the darkness seen on the part of the object where light cannot reach
+Drop Shadow - this shadow is the one that is going to display the darkness on the plane behind the object
+
+It is very hard for GPUs to render good shadowing at a high rate because 3D softwares use something known as ray-tracing. It has been a problem for a long time
+Three.js has a built-in solution that is not 100% accurate but it works well and is very convenient
+
+How does three.js do this?
+- When we do one render, three.js will do a render for each light supporting shadows
+- Those renders will simulate what the light sees as if it was a camera
+- During these 'light' renders, all the meshes' materials are replaced by MeshDepthMaterial so that it can calculate the depth information
+- These 'light' renders are stored as textures and we call them shadow maps
+- These textures are then used on every material supposed to receive shadows and projected on the geometry
+
+How to create shadows in our scene?
+- We need to let our renderer know that it has to render the light renders : renderer.shadowMap.enabled = true
+- Next we need to set properties on the objects to cast / receive shadows : object.castShadow = true | object.receiveShadow = true
+- Then we need to tell our light that we need shadowing. Only these three types of light support shadows - Point | Directional | Spot : light.castShadow = true
+
+SHADOW MAP OPTIMIZATIONS-
+Render Size-
+We can change the width and height of the shadowMap
+the shadowMap is stored on the light source. eg. directionalLight.shadow which, in this case, is an instance of the class DirectionalLightShadow
+It has many properties including the mapSize
+If we increase the x and y of the mapSize property, we will get a better looking shadow (we will set it to 1024) - the same x and y can be accessed as width and height as well
+We need to keep the pixel values as multiples of 2 so as to be eligible for mipmappings
+
+Near and Far-
+Since we know that the light source acts like a camera to get the shadowMap, we can adjust its near and far properties to correctly fit our scene
+It can be used to avoid glitches in the shadow. Does not improve the shadow very much
+To get a good anticipation of the perfect values for near and far, we can use a camera helper to find them
+
+Amplitude-
+For orthographic camera in directional light, we can control the left, right, top and bottom properties
+
+If we wrongly assign the near, far, left, right, top or bottom to values that are smaller than required, we get unexpected cropping of the shadow
+
+Blur-
+We can add blur to the shadow by assigning a value to the radius property of the shadow. The technique does not use the proximity of the camera with the object - check where the sphere and the plane are close, the blur remains the same around the whole circle which is a bit weird, but it is not very bad either
+
+SHADOW MAP ALGORITHMS-
+There are different types of shadow map algorithms:
+1. BasicShadowMap - Very performant but lousy quality
+2. PCFShadowMap - Less performant but smoother edges (default)
+3. PCFSoftShadowMap - Less performant but even softer edges (PREFFERED) - radius blur does not work with this algorithm but we can reduce the resolution of the directionalLight camera to get a similar result
+4. VSMShadowMap - Less performant, more constraints, can have unexpected results
+
+We can do the same steps for SpotLights as well -
+* Point to note - While using spotlight, we have a perspective camera and not an orthographic camera, hence while optimizing, we need to use the FOV of the perspective camera
+
+For Point Lights -
+We get a light render for a point light from a perspective camera but with a render in all six directions of a cube because a point light can generate light in all directions from its single point
+Do not change the FieldOfView for PointLightCamera - can cause unexpected results
+
+
+SHADOW BAKING -
+
+After all these tweaks and addition of shadows from objects dynamically, we find that it can take a lot of compute to produce and at the same time it is not very accurate
+Hence, we can bake the shadow images on a 2D surface and then render it like a shadow for our scene
+
+How to do this?
+1. Deactivate all other shadows from the renderer
+2. Load the texture
+3. On the plane, replace the material with MeshBasicMaterial and map this texture
+
+Disadvantage - IT IS STATIC AS IT IS FIXED TO THE PLANE
+
+SHADOW BAKING ALERNATIVE-
+To avoid the problem of shadow baking being static, we can add another mesh that is right below the sphere and a bit above the plane (to avoid z- fighting) and then apply an alpha map to that plane with a shadow texture
+Next, we can make this plane move along with the sphere (or any other object in the scene)

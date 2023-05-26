@@ -1,0 +1,79 @@
+MATERIALS -
+
+Materials are used to color each pixel of the geometry
+It internally uses shader programs to give us the experience
+If we are able to use the built-in materials directly, we do not need to write shaders ourselves
+
+Types of Materials-
+1. MeshBasicMaterial-
+    We have already used the MeshBasicMaterial but have not used all the properties
+    Most of the properties here can be set in two ways - either pass it in the constructor as an object or change the related properties on the instances
+    (To update the color property, we need to use the set method or assign it with a new instance of the color class)
+    We can use texture and color together - can give a tinting effect
+    When we are using alpha or opacity, it is important to set the transperant property of the material to true
+    We can use the side property of the material to view it from both sides using THREE.DoubleSide. eg. a plane will be visible from both sides and a closed structure would have the texture inside out - This can cause performance problems at times
+
+2. MeshNormalMaterial-
+    It is a representation of the surface normals of the object. With this information, we can render the objects correctly with just 1 face instead of having multiple faces to represent an object and adding load to the GPU
+    The direction of the normal gives the coloration
+    Normals can be used for lighting, reflection and refraction
+    FlatShading is and additional property in MeshNormalaterial apart from the MeshBasicMaterial
+
+3. MeshMatcapMaterial-
+    This will display a color by using the normals as a reference to pick the right color on a texture that looks like a sphere
+    So, we have an image that is of a sphere with certain incident light and that capture is converted into a texture such that it preserves the effect of the incident light
+    This type of Material has an additional property called as the matcap. We can set this property to the texture that we have created from the matcap image
+    Hence, in a way, we are simulating lighting without having lights in the scene
+    Where to find matcaps?
+    https://github.com/nidorx/matcaps or we can make one on our own using 2D software like Photoshop
+
+4. MeshDepthMaterial-
+    This simply colors the geometry white if it is closer to the camera and with darker shades of grey as it goes away from the camera
+
+5. MeshLambertMaterial-
+    This material reacts to light
+    It is performant but we can see strange patterns on the geometry like vertical lines
+
+6. MeshPhongMaterial-
+    This is similar to the MeshLambertMaterial but the strange patterns are now less visible and refection of light is visible with greater prominence but at the cost of some performance
+    We can control the light reflection with 'shininess' and the color of the refection with 'specular'
+
+7. MeshToonMaterial-
+    This gives us a cartoon-like render which could be thought of the cartoon version of the MeshLambertMaterial
+    We can change the gradient by adding more steps using the gradientTexture that we have loaded
+    If the gradient image is very small, we will see a smooth gradient instead of the clear separation as the magFilter tries to fix it with mipmappings
+    To prevent this, we can set minFilter and magFilter to THREE.NearestFilter and deactivate the mipmappings.
+
+8. MeshStandardMaterial-
+    This gives us a very good render which follows PBR principles like metalness and roughness
+    We can set the metalness and roughness properties
+    We can apply texture to the MeshStandardMaterial
+    We can apply aoMap ("ambient occlusion map") which will add shadows where the texture is dark, but we need to provide a new set of UV coordinates for this mapping in three.js which would be called 'uv2'
+
+    * We can use displacementMap on the material and map it to the heightTexture - we can also adjust the displacementScale
+
+    * There is also provision of metalness and roughness maps in the material and when using them, we should make sure that we have not manually added any metalness or roughness because these values will get combined with the maps and give us a result we would not desire
+
+    * We can use the normal map to add a lot of detail to the render. It will fake the normals orientation and add details on the surface regardless of the subdivisions. It will cause some strain on the GPU but it is far less than having more vertices which then need to be modified by a height map. Hence, using a normal map is the best option for such detailed renders. We can add normalScale to adjust the intensity of the effect
+
+9. MeshPhysicalMaterial-
+    It is the same as the MeshStandardMaterial but with support of a clear coat effect suited for only particular objects
+    * Clear coats as protective layers provide higher mechanical and chemical resistance properties and better appearance as well
+    This method if used throughout could be very performance ineffective
+    Refer to the three.js example
+
+10. PointsMaterial-
+    Used to make particles
+
+11. ShaderMaterial and RawShaderMaterial-
+    Can be used when we are making our own materials
+
+
+ENVIRONMENT MAPS-
+They provide us with the environment around out scene on the objects
+Currently, three.js only supports cube maps
+We need a CubeTextureLoader to load these Environment Maps
+We can use the envMap property on the material to apply this to the render
+
+Where to find environment maps? - Search from the web - HDRIHaven - This is under CC0 license, so we can use them freely without any second thoughts
+How to convert HDRI to cube images? - https://matheowis.github.io/HDRI-to-CubeMap/

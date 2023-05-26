@@ -1,0 +1,16 @@
+Debug UI-
+
+We need a quick way to see if our animation is correct and make modifications on the fly with on-screen controls. This would help the developers and the clients
+
+We can use such controls called as Debug UIs that help us change the color and other properties of the scene from the screen. This is called Debug UI
+
+There are many libraries available that can help us with this -
+1. dat.GUI
+2. control-panel
+3. Controlkit
+4. Guify
+5. Oui
+
+dat.GUI-
+* We can add muliple types of controls to our debug UI, eg. range, color, text, checkbox, button (to trigger functions), select, folder (to organise the controls)
+* To add an object to the debug menu, we need to add it using gui.add(...) and pass an object into it with other parameters like min, max and precision. eg. gui.add(mesh.position, 'x', -3, 3, 0.01)

@@ -1,0 +1,19 @@
+SHADER PATTERNS -
+
+* Often we need to draw specific patterns like stars, circles, light lenses, waves, etc. We might either need to see those patterns or to move the vertices
+
+* We could use textures but they are often heavy and can cause performance problems when loaded into the GPU. Also, it does not give us as much control as we would get if we draw the shapes. We need some mathematical skills to work with the coordinate system to give us those patterns.
+(Note - We can use Gimp to give textures transformations like rotation, etc.)
+
+* There can be simple patters like simple gradients, etc and there are complex ones like Perlin compositions
+
+* REMEMBER - The uv coordinates (vUv in the fragment) goes from (0.0, 0.0) in the bottom-left corner to (1.0, 1.0) on the top-right
+
+* Perlin Noise -
+    - Used to recreate natural looking patterns
+    - https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+
+* mix(...) -
+    - First param can be a float, vec2, vec3, vec4
+    - Second input should be of the same type as the first
+    - Third param lets us decide which of the first two should be used more

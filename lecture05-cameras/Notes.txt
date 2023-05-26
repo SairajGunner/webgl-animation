@@ -1,0 +1,34 @@
+CAMERAS -
+
+There are multiple types of cameras available in three.js with the most commonly used one being the PerspectiveCamera, the one we have already used in our previous exercises
+
+
+The types of cameras are as follows -
+
+1. Camera - This is an abstract class that is inherited by all the other cameras. This cannot be used directly
+2. Stereo Camera - This camera places two cameras just like our eyes. Can be used for VR
+3. Array Camera - This lets us setup multiple cameras and then render using all of them. So at one time, we can see parts on the screen with the capture from each of these cameras
+4. Cube Camera - This camera helps us with six views, the six being contributed by all the six sides of a Cube
+5. Perspective Camera - This has been already used but we will be going through all the properties again
+    i. FoV- Vertical Field of View (45 - 75 recommended)
+    ii. Aspect Ratio - Width of renderer/ Height of renderer
+    iii. near - the distance between the object and the camera before which the object would be clipped
+    iv. far - the distance after which the object would be clipped
+
+    Recommended value for near and far? - Well, one might think that since everything needs to be viewed, we can have a very small near distance, say 0.0001 and a very large far distance, say 99999 which is a BIG MISTAKE. It would lead to something known as z-fighting because with such capture range, the GPU would have difficulty in identifying which object is closer to the camera and which is farther when the two objects are placed close to each other
+    The correct value for these parameters would depend on the scene we are working on. Near distance of 0.1 is quite close and good enough while a far distance of 100 units is also a good idea but can be chosen according to what we need
+
+6. Orthographic Camera - This camera does not have a cone of view like in our PerspectiveCamera but it will capture the image parallel to it according to the coordinates we are providing for let, right, top and bottom parameters. So, let's say we are capturing a cube with an orthographic camera that has square coordinates in a renderer that has aspect ratio of 1.33333 (800/600), the cube would be a bit flat. Hence, if we need to capture an image in a particular aspect, we need to multiply the aspect ratio along the x-axis (if width of the renderer > its height)
+
+
+Updating the position of the camera on mouse move!!!! -
+We need to capture the coordinates of the mouse by listening to the mouse move event of the mouse and then normalize the coordinates so that the centre of the renderer is (0, 0)
+To make the camera look behind the object we can use trigonometry
+
+Also, to make this easier, Three.js has some classes that help with these features without a lot of code from developers. Check the following link -
+https://threejs.org/docs/index.html?q=controls#examples/en/controls/DeviceOrientationControls
+
+OrbitControl -
+This helps us with a mouse left down and move to make a movement, scroll to zoom in and out and right click and move to pan
+We can enable properties like target, enableDamping but need to call the update() function to make the changes
+If we are using damping, we need to make sure that we are updating the control on each frame by placing update() call in requestAnimationFrame()

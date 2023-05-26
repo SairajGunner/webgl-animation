@@ -1,0 +1,79 @@
+PHYSICS -
+
+* Adding physics to our scene would help us get realisitic effects of collision with many physical phenomena
+
+* Adding a physics engine can be thought of adding a new world to our 3D world (three.js) which can be called as the physics world and then combining both of them into the 3D world - So the physical phenomena would change the dynamics of the object in the physics world and we can use those coordinates to update our 3D world
+
+* Even though we are working with 3D, it is not necessary that we have to use a 3D physics engine. A 2D physics engine can also work fine (if we are not dealing with all three axes at once)
+
+* Some 3D Engines -
+    1. Ammo.js - most used 3d physics library but a bit complex
+    2. Cannon.js - we use this as it is easier to understand
+    3. Oimo.js
+
+* Some 2D Engines -
+    1. Matter.js
+    2. P2.js
+    3. Planck.js
+    4. Box2D.js
+
+* There are some engines that combine the physics world and 3D world together, eg. Physijs
+
+* In the physics world, we use the cannon js classes and objects to create our world. There are some analogies between the classes in three js and cannon js, for eg. -
+    1. scene ~ world
+    2. geometry ~ shape
+    3. mesh ~ body
+    4. Vector3 ~ Vec3
+
+* To update the physics world and the three js scene, we have to use the tick function as it is called on every frame
+    * For the physics world, we use the step function which accepts these three parameters -
+        1. a fixed time step
+        2. how much time passed since the last step
+        3. how many iterations the world can apply to catch up with a potential delay
+
+* In our example, when we create the sphere in the physics world and update the coordinates in the 3D world, the sphere just goes past the plane we have made as the floor. This is because we would need to setup the plane in the physics world as well
+
+* The physics world plane is endless. Its length and width are infinite and it can be thought of as the floor of the world if we change its mass to 0 so that gravity does not have effect on it
+
+* Rotation in CANNON.js needs quaternion only. In our example, we have used the 'setFromAxisAngle' mehtod which accepts two parameters -
+    1. a direction vector or axis for rotation which is of Vec3 type
+    2. the angle of rotation around that axis
+
+* We can create various types of materials in CANNON.js like 'concrete', 'plastic', etc. - which can be set to help us reference the particular object to help readability of the code - which can help us modify the behaviour during friction or collision
+
+* In our example, first we used two different materials to just understand how we can make multiple materials and add behaviour between them, but generally in real projects the practice is to use only one default material and the behaviour between them - We can set this defualt contact material to the whole physics world by saying : world.defaultContactMaterial = defaultContactMaterial instead of having to pass the material in each of the bodies
+
+* APPLYING FORCE TO BODIES -
+* There are four functions in cannon js to help us with application of force on a body -
+    1. applyForce(...) - apply a force from a specific point in space (not necessarily on the body) like wind, small push of a domino or a strong force like on an angry bird - WE WILL BE USING THIS
+    2. applyImpulse(...) - this is like applyForce(...) but would directly modify the velocity of the body
+    3. applyLocalForce(...) - this is applyForce(...) but the force is applied to coordinates local to the body ((0, 0, 0) would be the centre of the body)
+    4. applyLocalImpulse(...) - same as applyImpulse(...) but the coordinates are local to the body
+
+* PERFORMANCE IMPROVEMENTS IN PHYSICS ENGINES (cannon js in our case) -
+    1. Broadphase - The phase of checking for collision with other bodies in the world in the execution cycle is called the Broadphase. The default algorithm known as the NaiveBroadphase checks for collision against every other body in the world. The available algorithms are -
+        i. NaiveBroadphase
+        ii. GridBroadphase - This divides the world into grids along all the three axes and checks for collisions within the body's own grid and the neighboring grids but not the ones that are away. This can improve performance, but lead to unexpected behaviour if we have very fast moving bodies in the world
+        iii. SAPBroadphase (Sweep and Prune) - tests bodies on arbitrary axes during multiple steps - this is the best in terms of performance even though it has a similar problem with respect to fast moving bodies
+    
+    2. Sleep - 
+    * Even if we are using the best of broadphase algorithms, we need to make sure that we are not testing the bodies that have already stopped moving
+    * We can do this by marking the body that it is asleep when the movement is very slow, such that the eye cannot perceive and wake it up only when a considerable amount of force is applied to it
+    * All we need to do is say - world.allowSleep = true;
+    * We can also use properties like sleepSpeedLimit and sleepTimeLimit to control how likely a body is going to go asleep
+
+* ADDING EVENTHANDLERS TO EVENTS IN OUR PHYSICS -
+    * We can listen to body events like 'collide', 'sleep' or 'wakeup' and assign eventhandlers to those so as to perform some action on them
+    * In our example, we are going to play a 'hit' sound when two bodies collide
+
+* ADDING CONSTRAINTS TO CHANGE BODY INTERACTIONS -
+    * We can use constraints to add constraints to the movement of the bodies in particular manners such as -
+        1. HingeConstraint - will work as a hinge (door)
+        2. DistanceConstraint - will always keep the distance between the two bodies the same (need to check if it lets the bodies get closer than the constrained amount)
+        3. LockConstraint - merges the bodies like if they were in one piece
+        4. PointToPointConstraint - glues the bodies to a specific point
+
+* IMPROVING PERFORMANCE USING WORKERS -
+    * When we execute javascript code, it is all done with just one thread on the CPU which might get overloaded if we have a lot of physics going on
+    * Hence, we can shift some of the code to a worker so that this part is handled by another thread
+    * Usually, we let another worker handle the physics logic and all the other normal javascrip is handled by the normal thread
